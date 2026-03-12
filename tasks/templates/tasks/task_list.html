@@ -1,0 +1,78 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager | Professional</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'tasks/style.css' %}">
+</head>
+<body>
+    <div class="navbar">
+        ✦ Task Manager Pro
+    </div>
+    
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h2>My Tasks</h2>
+            <a href="/add/" class="btn btn-add">
+                <span>+</span> Add Task
+            </a>
+        </div>
+
+        <div class="search-box">
+            <form method="GET">
+                <input type="text" name="q" placeholder="Search tasks..." value="{{ request.GET.q }}">
+                <button type="submit" class="btn btn-add">Search</button>
+            </form>
+        </div>
+
+        <div class="filters">
+            <a href="/" class="btn">All</a>
+            <a href="/?status=completed" class="btn">Completed</a>
+            <a href="/?status=pending" class="btn">Pending</a>
+        </div>
+
+        {% for task in tasks %}
+        <div class="task-card">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                <h3>{{ task.title }}</h3>
+                <span class="
+                    {% if task.priority == 'H' %}priority-high
+                    {% elif task.priority == 'M' %}priority-medium
+                    {% else %}priority-low{% endif %}">
+                    {{ task.get_priority_display }}
+                </span>
+            </div>
+            
+            <p>Category: {{ task.category.name|default:"Uncategorized" }}</p>
+            
+            <p>
+                Status:
+                {% if task.completed %}
+                <span class="status-badge" style="background: #d1fae5; color: #059669;">✓ Completed</span>
+                {% else %}
+                <span class="status-badge" style="background: #fef3c7; color: #d97706;">⏳ Pending</span>
+                {% endif %}
+            </p>
+            
+            {% if task.due_date %}
+            <p>Due: {{ task.due_date|date:"M d, Y" }}</p>
+            {% endif %}
+            
+            <p><small>Created: {{ task.created_at|date:"M d, Y" }}</small></p>
+            
+            <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                <a href="/edit/{{ task.id }}/" class="btn btn-edit">Edit</a>
+                <a href="/delete/{{ task.id }}/" class="btn btn-delete" onclick="return confirm('Are you sure?')">Delete</a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="no-tasks">
+            No tasks available. Create your first task to get started!
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
